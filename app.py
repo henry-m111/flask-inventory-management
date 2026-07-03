@@ -2,7 +2,7 @@
 Flask REST API for the Inventory Management System.
 Provides CRUD endpoints for managing inventory items.
 """
-
+import external_api
 from flask import Flask, jsonify, request
 import models
 
@@ -65,6 +65,52 @@ def delete_inventory_item(item_id):
         return jsonify({"error": f"Item with id {item_id} not found."}), 404
 
     return jsonify({"message": f"Item with id {item_id} deleted."}), 200
+
+
+
+@app.route("/inventory/lookup/barcode/<barcode>", methods=["GET"])
+def lookup_by_barcode(barcode):
+    """Look up a product on OpenFoodFacts by barcode (does not save it)."""
+    product = external_api.get_product_by_barcode(barcode)
+
+    if product is None:
+        return jsonify({"error": f"No product found for barcode {barcode}."}), 404
+
+    return jsonify(product), 200
+
+
+@app.route("/inventory/lookup/name/<name>", methods=["GET"])
+def lookup_by_name(name):
+    """Search OpenFoodFacts by product name (does not save it)."""
+    results = external_api.search_product_by_name(name)
+
+    if not results:
+        return jsonify({"error": f"No products found matching '{name}'."}), 404
+
+    return jsonify(results), 200
+
+
+@app.route("/inventory/import/barcode/<barcode>", methods=["POST"])
+def import_by_barcode(barcode):
+    """
+    Look up a product by barcode on OpenFoodFacts and add it directly
+    to the inventory. Allows overriding/adding fields (like price,
+    quantity_in_stock) via the request body.
+    """
+    product = external_api.get_product_by_barcode(barcode)
+
+    if product is None:
+        return jsonify({"error": f"No product found for barcode {barcode}."}), 404
+
+    # Allow the client to add inventory-specific fields (price, stock)
+    # that OpenFoodFacts doesn't provide.
+    extra_data = request.get_json(silent=True) or {}
+    product.update(extra_data)
+
+    new_item = models.add_item(product)
+    return jsonify(new_item), 201
+
+
 
 
 if __name__ == "__main__":
