@@ -57,5 +57,14 @@ def fetch_and_add_item(barcode):
     new_item = models.add_item(product_data)
     return jsonify(new_item), 201
 
+@app.route("/inventory/search", methods=["GET"])
+def search_items():
+    """Search inventory items by name using a query parameter."""
+    query = request.args.get("name", "")
+    if not query:
+        return jsonify({"error": "Please provide a 'name' query parameter"}), 400
+    results = models.search_items_by_name(query)
+    return jsonify(results), 200
+
 if __name__ == "__main__":
     app.run(debug=True)

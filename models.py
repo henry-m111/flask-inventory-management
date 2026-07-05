@@ -57,3 +57,8 @@ def delete_item(item_id):
         return False
     inventory.remove(item)
     return True
+
+def search_items_by_name(query):
+    """Return all items whose name contains the search query (case-insensitive)."""
+    query = query.lower()
+    return [item for item in inventory if item.get("name") and query in item["name"].lower()]
