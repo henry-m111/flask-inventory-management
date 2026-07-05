@@ -34,3 +34,18 @@ def get_item_by_id(item_id):
         if item["id"] == item_id:
             return item
     return None
+
+def update_item(item_id, data):
+    """Update an existing item's fields. Returns the updated item, or None if not found."""
+    item = get_item_by_id(item_id)
+    if item is None:
+        return None
+    if "name" in data:
+        item["name"] = data["name"]
+    if "brand" in data:
+        item["brand"] = data["brand"]
+    if "price" in data:
+        item["price"] = data["price"]
+    if "quantity" in data:
+        item["quantity"] = data["quantity"]
+    return item
