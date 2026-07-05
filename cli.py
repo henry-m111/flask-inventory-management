@@ -75,6 +75,16 @@ def delete_item():
     else:
         print("Failed to delete item:", response.json())
 
+def fetch_from_api():
+    """Prompt user for a barcode and fetch the product from OpenFoodFacts via the API."""
+    barcode = input("Enter barcode: ")
+    response = requests.post(f"{API_URL}/fetch/{barcode}")
+    if response.status_code == 201:
+        print("Product fetched and added to inventory:")
+        print(response.json())
+    else:
+        print("Failed to fetch product:", response.json())
+
 def main():
     while True:
         print("\n--- Inventory Management CLI ---")
@@ -82,7 +92,8 @@ def main():
         print("2. Add new item")
         print("3. Update item")
         print("4. Delete item")
-        print("5. Exit")
+        print("5. Find item on API (by barcode)")
+        print("6. Exit")
         choice = input("Choose an option: ")
 
         if choice == "1":
@@ -94,10 +105,12 @@ def main():
         elif choice == "4":
             delete_item()
         elif choice == "5":
+            fetch_from_api()
+        elif choice == "6":
             print("Goodbye!")
             break
         else:
             print("Invalid option, try again.")
-
+            
 if __name__ == "__main__":
     main()
