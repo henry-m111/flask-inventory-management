@@ -49,3 +49,11 @@ def update_item(item_id, data):
     if "quantity" in data:
         item["quantity"] = data["quantity"]
     return item
+
+def delete_item(item_id):
+    """Remove an item from inventory. Returns True if deleted, False if not found."""
+    item = get_item_by_id(item_id)
+    if item is None:
+        return False
+    inventory.remove(item)
+    return True
