@@ -11,6 +11,8 @@ next_id = 1
 def get_all_items():
     """Return all items currently in inventory."""
     return inventory
+
+
 def add_item(data):
     """Add a new item to inventory and return it."""
     global next_id
@@ -24,3 +26,11 @@ def add_item(data):
     inventory.append(item)
     next_id += 1
     return item
+
+
+def get_item_by_id(item_id):
+    """Return a single item by its id, or None if not found."""
+    for item in inventory:
+        if item["id"] == item_id:
+            return item
+    return None
