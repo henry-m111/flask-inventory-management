@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import models
+import external_api
 
 app = Flask(__name__)
 
@@ -46,6 +47,15 @@ def delete_item_route(item_id):
     if not deleted:
         return jsonify({"error": "Item not found"}), 404
     return jsonify({"message": "Item deleted"}), 200
+
+@app.route("/inventory/fetch/<barcode>", methods=["POST"])
+def fetch_and_add_item(barcode):
+    """Fetch product details from OpenFoodFacts and add to inventory."""
+    product_data = external_api.fetch_product_by_barcode(barcode)
+    if product_data is None:
+        return jsonify({"error": "Product not found in OpenFoodFacts"}), 404
+    new_item = models.add_item(product_data)
+    return jsonify(new_item), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
