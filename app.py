@@ -1,6 +1,12 @@
 from flask import Flask, jsonify, request
 import models
 import external_api
+import data
+
+app = Flask(__name__)
+data.seed_inventory()   # populate models.inventory with real product data on startup
+
+# ... rest of your routes stay exactly the same
 
 # Simple Flask API for inventory management.
 # The data is stored in memory while the app runs.

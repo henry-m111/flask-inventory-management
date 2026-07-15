@@ -18,6 +18,28 @@ def view_items():
     for item in items:
         print(f"[{item['id']}] {item['name']} - {item['brand']} - ${item['price']} - qty: {item['quantity']}")
 
+
+def view_item_by_id():
+    """Fetch and display a single inventory item by its id."""
+    item_id = input("Item id to view: ")
+    try:
+        response = requests.get(f"{API_URL}/{item_id}")
+        item = response.json()
+    except requests.exceptions.ConnectionError:
+        print("Error: Could not connect to the API. Is the server running?")
+        return
+    except ValueError:
+        print("Invalid response from server.")
+        return
+
+    if response.status_code == 200:
+        print(f"[{item['id']}] {item['name']} - {item['brand']} - ${item['price']} - qty: {item['quantity']}")
+    elif response.status_code == 404:
+        print("Item not found.")
+    else:
+        print("Failed to get item:", item)
+
+
 def add_item():
     """Prompt user for item details and add it via the API."""
     name = input("Item name: ")
@@ -89,24 +111,27 @@ def main():
     while True:
         print("\n--- Inventory Management CLI ---")
         print("1. View all items")
-        print("2. Add new item")
-        print("3. Update item")
-        print("4. Delete item")
-        print("5. Find item on API (by barcode)")
-        print("6. Exit")
+        print("2. View item by id")
+        print("3. Add new item")
+        print("4. Update item")
+        print("5. Delete item")
+        print("6. Find item on API (by barcode)")
+        print("7. Exit")
         choice = input("Choose an option: ")
 
         if choice == "1":
             view_items()
         elif choice == "2":
-            add_item()
+            view_item_by_id()
         elif choice == "3":
-            update_item()
+            add_item()
         elif choice == "4":
-            delete_item()
+            update_item()
         elif choice == "5":
-            fetch_from_api()
+            delete_item()
         elif choice == "6":
+            fetch_from_api()
+        elif choice == "7":
             print("Goodbye!")
             break
         else:
