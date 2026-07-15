@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 import models
 import external_api
 
+# Simple Flask API for inventory management.
+# The data is stored in memory while the app runs.
+# This makes it easier to learn CRUD without a real database.
 app = Flask(__name__)
 
 
@@ -15,14 +18,6 @@ def get_inventory():
     """Fetch all inventory items."""
     return jsonify(models.get_all_items()), 200
 
-
-@app.route("/inventory", methods=["POST"])
-def create_item():
-    """Add a new inventory item."""
-    data = request.get_json()
-    new_item = models.add_item(data)
-    return jsonify(new_item), 201
-
 @app.route("/inventory/<int:item_id>", methods=["GET"])
 def get_item(item_id):
     """Fetch a single inventory item by id."""
@@ -30,6 +25,13 @@ def get_item(item_id):
     if item is None:
         return jsonify({"error": "Item not found"}), 404
     return jsonify(item), 200
+
+@app.route("/inventory", methods=["POST"])
+def create_item():
+    """Add a new inventory item."""
+    data = request.get_json()
+    new_item = models.add_item(data)
+    return jsonify(new_item), 201
 
 @app.route("/inventory/<int:item_id>", methods=["PATCH"])
 def update_item_route(item_id):
@@ -48,6 +50,16 @@ def delete_item_route(item_id):
         return jsonify({"error": "Item not found"}), 404
     return jsonify({"message": "Item deleted"}), 200
 
+@app.route("/inventory/search", methods=["GET"])
+def search_inventory():
+    """Search inventory items by name query."""
+    query = request.args.get("name")
+    if not query:
+        return jsonify({"error": "Missing name query parameter"}), 400
+    results = models.search_items_by_name(query)
+    return jsonify(results), 200
+
+
 @app.route("/inventory/fetch/<barcode>", methods=["POST"])
 def fetch_and_add_item(barcode):
     """Fetch product details from OpenFoodFacts and add to inventory."""
@@ -57,14 +69,6 @@ def fetch_and_add_item(barcode):
     new_item = models.add_item(product_data)
     return jsonify(new_item), 201
 
-@app.route("/inventory/search", methods=["GET"])
-def search_items():
-    """Search inventory items by name using a query parameter."""
-    query = request.args.get("name", "")
-    if not query:
-        return jsonify({"error": "Please provide a 'name' query parameter"}), 400
-    results = models.search_items_by_name(query)
-    return jsonify(results), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

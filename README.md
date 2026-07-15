@@ -16,13 +16,18 @@ Summative lab project for Moringa School. A small Flask API for managing invento
 ```bash
 git clone https://github.com/henry-m111/flask-inventory-management.git
 cd flask-inventory-management
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt --break-system-packages
-python app.py
+pipenv install --dev
+pipenv shell
+pipenv run python app.py
 ```
 
 Server runs at `http://127.0.0.1:5000`.
+
+If you already have an old local virtual environment, remove it first:
+
+```bash
+rm -rf venv .venv
+```
 
 ## Routes
 
